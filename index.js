@@ -26,9 +26,9 @@ async function run ()
   try
   {
     // Connect the client to the server
-    await client.connect();
+    // await client.connect();
     console.log( "Connected to MongoDB!" );
-
+    
     const spotsCollection = client.db( 'spotsDB' ).collection( 'spots' );
 
     // Define routes after connecting to the database
@@ -56,16 +56,6 @@ async function run ()
       const result = await spotsCollection.findOne( query );
       res.send( result );
     } )
-
-
-
-    // // Find spot by email and return it as JSON
-    // app.get( '/spots/:email', async ( req, res ) =>    {   
-    //   console.log(req.params.email);
-    //   const result = await spotsCollection.find({email:
-    //   req.params.email} ).toArray;
-    //   res.send( result );
-    // } );
 
 
     // Find spot by email and return it as JSON
