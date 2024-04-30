@@ -59,14 +59,61 @@ async function run ()
 
 
 
-    // Find one spot by email and return it as JSON
-    app.get( '/spots/:email', async ( req, res ) =>    {
-   
-      console.log(req.params.email);
-      // const query = { email: userEmail }; // Query by email
-      const result = await spotsCollection.find({email:req.param.email} ).toArray;
-      res.send( result );
+    // // Find spot by email and return it as JSON
+    // app.get( '/spots/:email', async ( req, res ) =>    {   
+    //   console.log(req.params.email);
+    //   const result = await spotsCollection.find({email:
+    //   req.params.email} ).toArray;
+    //   res.send( result );
+    // } );
+
+
+    // Find spot by email and return it as JSON
+    app.get( '/spots/email/:email', async ( req, res ) =>
+    {
+      try
+      {
+        const email = req.params.email;
+        const result = await spotsCollection.find( { email: email } ).toArray();
+        res.send( result );
+      } catch ( error )
+      {
+        console.error( 'Error fetching spots by email:', error );
+        res.status( 500 ).send( { error: 'Internal server error' } );
+      }
     } );
+
+    // Update  a spot by its ID. Requires the data in the body of the PUT request to contain
+    // at least an `updatedAt` timestamp. Returns the updated document as JSON.
+    app.put( "/spots/:id", async ( req, res ) =>
+    {
+      if ( !req.body.updatedAt )
+      {
+        return res.status(400).send({ error: "Missing `updatedAt` timestamp in request body" });
+      }
+
+      const note = req.body;  
+      let updatedDocument = {};
+
+      try
+      {
+        updatedDocument = await spotsCollection.findOneAndUpdate(
+          { _id: req.params.id },
+          { $set: note, updatedAt: new Date() },
+          { returnOriginal: false }
+        );
+      } catch ( e )
+      {
+        console.log(e);
+        return res.status(400).send({ error: "Could not update note"});
+      }
+      
+      res.send( updatedDocument.value );
+    } );
+
+  
+
+
 
 
     // Delete a spot by id
