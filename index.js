@@ -83,45 +83,52 @@ async function run ()
       }
     } );
 
-    // Update  a spot by its ID. Requires the data in the body of the PUT request to contain
+    // To Update  a spot by its ID create a method. Requires the data in the body of the PUT request to contain
     // at least an `updatedAt` timestamp. Returns the updated document as JSON.
-    app.put( "/spots/:id", async ( req, res ) =>
+    app.get( "/spots/:id", async ( req, res ) =>
     {
-      if ( !req.body.updatedAt )
-      {
-        return res.status(400).send({ error: "Missing `updatedAt` timestamp in request body" });
+      console.log( req.params.id );
+      const result = await spotsCollection.findOne( {
+        _id: new ObjectId( req.params.id ),
+      } );
+
+      console.log( result );
+      res.send( result );
+    } )
+
+    // Update a  specific spot based on its ID. 
+    app.put( "/updateSpots/:id", async ( req, res ) =>
+    {
+      console.log( req.params.id );
+      const query = { _id: new ObjectId( req.params.id ) };
+      const data = {
+        $set: {
+          tourists_spot_name: req.body.tourists_spot_name,
+          country_name: req.body.country_name,
+          location: req.body.location,
+          short_description: req.body.short_description,
+          average_cost: req.body.average_cost,
+          seasonality: req.body.seasonality,
+          travel_duration: req.body.travel_duration,
+          total_visitors_per_year: req.body.total_visitors_per_year,
+          image: req.body.image
+        }
       }
 
-      const note = req.body;  
-      let updatedDocument = {};
+      const result = await spotsCollection.updateOne( query, data )
+      console.log( result );
+      res.send( result )
 
-      try
-      {
-        updatedDocument = await spotsCollection.findOneAndUpdate(
-          { _id: req.params.id },
-          { $set: note, updatedAt: new Date() },
-          { returnOriginal: false }
-        );
-      } catch ( e )
-      {
-        console.log(e);
-        return res.status(400).send({ error: "Could not update note"});
-      }
-      
-      res.send( updatedDocument.value );
-    } );
-
-  
-
+    } )
 
 
 
     // Delete a spot by id
-    app.delete( '/spots/:id', async ( req, res ) =>
+    app.delete( '/delete/:id', async ( req, res ) =>
     {
-      const id = req.params.id;
-      const query = { _id: new ObjectId( id ) };
-      const result = await spotsCollection.deleteOne( query );
+
+      const result = await spotsCollection.deleteOne( { _id: new ObjectId( req.params.id ) } );
+      console.log( result );
       res.send( result );
     } );
 
