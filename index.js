@@ -1,4 +1,5 @@
 
+// declare a  variable named "express"
 const express = require( 'express' );
 const cors = require( 'cors' );
 require( 'dotenv' ).config();
@@ -28,7 +29,7 @@ async function run ()
     // Connect the client to the server
     // await client.connect();
     console.log( "Connected to MongoDB!" );
-    
+
     const spotsCollection = client.db( 'spotsDB' ).collection( 'spots' );
 
     // Define routes after connecting to the database
